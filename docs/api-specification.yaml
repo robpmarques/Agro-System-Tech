@@ -1,0 +1,804 @@
+openapi: 3.0.3
+info:
+  title: AgroTech System API
+  description: API para monitoramento inteligente em agricultura de precisão. Inclui gestão de usuários, áreas, sensores, leituras, regras e alertas.
+  version: 1.0.0
+  contact:
+    name: AgroTech Team
+servers:
+  - url: http://localhost:8080/api
+    description: Servidor de desenvolvimento
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+        role:
+          type: string
+          enum: [ADMIN, OPERADOR, ESPECIALISTA]
+        createdAt:
+          type: string
+          format: date-time
+    Area:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        location:
+          type: string
+        size:
+          type: number
+        userId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+    SensorPlan:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        areaId:
+          type: string
+          format: uuid
+        requestedBy:
+          type: string
+          format: uuid
+        specialistId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [PENDING, IN_PROGRESS, APPROVED, REJECTED]
+        notes:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        reviewedAt:
+          type: string
+          format: date-time
+    PlannedSensor:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        planId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+          enum: [TEMPERATURE, SOIL_HUMIDITY, AIR_HUMIDITY, LUMINOSITY]
+        position:
+          type: string
+          enum: [NORTE, SUL, LESTE, OESTE, CENTRO]
+        createdAt:
+          type: string
+          format: date-time
+    Sensor:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+        position:
+          type: string
+        areaId:
+          type: string
+          format: uuid
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+    SensorReading:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sensorId:
+          type: string
+          format: uuid
+        value:
+          type: number
+        recordedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+    Rule:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        operator:
+          type: string
+          enum: [">", "<", ">=", "<=", "=", "!="]
+        threshold:
+          type: number
+        isActive:
+          type: boolean
+        sensorId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+    Alert:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sensorId:
+          type: string
+          format: uuid
+        ruleId:
+          type: string
+          format: uuid
+        value:
+          type: number
+        message:
+          type: string
+        status:
+          type: string
+          enum: [ACTIVE, RESOLVED]
+        triggeredAt:
+          type: string
+          format: date-time
+        resolvedAt:
+          type: string
+          format: date-time
+    AuthRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+        details:
+          type: string
+security:
+  - bearerAuth: []
+paths:
+  /auth/register:
+    post:
+      summary: Registrar novo usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: Usuário criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/login:
+    post:
+      summary: Login de usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: Login bem-sucedido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Credenciais inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /auth/me:
+    get:
+      summary: Dados do usuário logado
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Dados do usuário
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Não autorizado
+  /users:
+    get:
+      summary: Listar usuários (ADMIN)
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de usuários
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '403':
+          description: Acesso negado
+  /users/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      summary: Atualizar role de usuário (ADMIN)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  enum: [ADMIN, OPERADOR, ESPECIALISTA]
+      responses:
+        '200':
+          description: Usuário atualizado
+        '403':
+          description: Acesso negado
+  /areas:
+    get:
+      summary: Listar áreas do usuário
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de áreas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Area'
+    post:
+      summary: Criar área (OPERADOR)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Area'
+      responses:
+        '201':
+          description: Área criada
+        '403':
+          description: Acesso negado
+  /areas/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      summary: Atualizar área
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Area'
+      responses:
+        '200':
+          description: Área atualizada
+        '403':
+          description: Acesso negado
+    delete:
+      summary: Excluir área
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Área excluída
+        '403':
+          description: Acesso negado
+  /sensor-plans:
+    get:
+      summary: Listar planos de sensores
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de planos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SensorPlan'
+    post:
+      summary: Criar plano de sensores (OPERADOR)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SensorPlan'
+      responses:
+        '201':
+          description: Plano criado
+        '403':
+          description: Acesso negado
+  /sensor-plans/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      summary: Atualizar status do plano
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [PENDING, IN_PROGRESS, APPROVED, REJECTED]
+      responses:
+        '200':
+          description: Status atualizado
+        '403':
+          description: Acesso negado
+  /sensor-plans/{id}/assign-specialist:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      summary: Atribuir especialista ao plano
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                specialistId:
+                  type: string
+                  format: uuid
+      responses:
+        '200':
+          description: Especialista atribuído
+        '403':
+          description: Acesso negado
+  /sensor-plans/{id}/planned-sensors:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Listar sensores planejados
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de sensores planejados
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlannedSensor'
+  /planned-sensors:
+    post:
+      summary: Criar sensor planejado (ESPECIALISTA)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlannedSensor'
+      responses:
+        '201':
+          description: Sensor planejado criado
+        '403':
+          description: Acesso negado
+  /planned-sensors/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      summary: Atualizar sensor planejado
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PlannedSensor'
+      responses:
+        '200':
+          description: Sensor atualizado
+        '403':
+          description: Acesso negado
+    delete:
+      summary: Excluir sensor planejado
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Sensor excluído
+        '403':
+          description: Acesso negado
+  /sensors:
+    get:
+      summary: Listar sensores
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de sensores
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sensor'
+    post:
+      summary: Criar sensor (automático após aprovação)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Sensor'
+      responses:
+        '201':
+          description: Sensor criado
+        '403':
+          description: Acesso negado
+  /sensors/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      summary: Ativar/desativar sensor
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                isActive:
+                  type: boolean
+      responses:
+        '200':
+          description: Sensor atualizado
+        '403':
+          description: Acesso negado
+    delete:
+      summary: Excluir sensor
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Sensor excluído
+        '403':
+          description: Acesso negado
+  /sensor-readings:
+    get:
+      summary: Listar leituras
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sensorId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Lista de leituras
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SensorReading'
+    post:
+      summary: Registrar leitura
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SensorReading'
+      responses:
+        '201':
+          description: Leitura registrada
+        '400':
+          description: Dados inválidos
+  /sensor-readings/{sensorId}/latest:
+    parameters:
+      - name: sensorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Última leitura de sensor
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Última leitura
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SensorReading'
+  /rules:
+    get:
+      summary: Listar regras
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de regras
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Rule'
+    post:
+      summary: Criar regra
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rule'
+      responses:
+        '201':
+          description: Regra criada
+        '403':
+          description: Acesso negado
+  /rules/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      summary: Atualizar regra
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rule'
+      responses:
+        '200':
+          description: Regra atualizada
+        '403':
+          description: Acesso negado
+    delete:
+      summary: Excluir regra
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Regra excluída
+        '403':
+          description: Acesso negado
+  /alerts:
+    get:
+      summary: Listar alertas
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [ACTIVE, RESOLVED]
+      responses:
+        '200':
+          description: Lista de alertas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Alert'
+  /alerts/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    put:
+      summary: Resolver alerta
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [RESOLVED]
+      responses:
+        '200':
+          description: Alerta resolvido
+        '403':
+          description: Acesso negado
+  /dashboard/summary:
+    get:
+      summary: Resumo do dashboard
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Dados do dashboard
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  averages:
+                    type: object
+                  recentReadings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SensorReading'
+                  activeAlerts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Alert'
+  /dashboard/charts:
+    get:
+      summary: Dados para gráficos
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: sensorId
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: period
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Dados para gráficos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object

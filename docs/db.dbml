@@ -1,0 +1,169 @@
+// =======================================
+// AGROTECH SYSTEM - DBML
+// =======================================
+
+// =======================================
+// USERS
+// =======================================
+
+Table users {
+  id uuid [primary key]
+  name varchar
+  email varchar [unique, not null]
+  password varchar [not null]
+  role varchar [note: 'ADMIN | OPERADOR | ESPECIALISTA']
+  created_at timestamp
+}
+
+// =======================================
+// AREAS
+// =======================================
+
+Table areas {
+  id uuid [primary key]
+  name varchar
+  location varchar
+  size double
+
+  user_id uuid [not null] // dono (OPERADOR)
+
+  created_at timestamp
+}
+
+// =======================================
+// SENSOR PLAN (SOLICITAÇÃO)
+// =======================================
+
+Table sensor_plans {
+  id uuid [primary key]
+
+  area_id uuid [not null]
+  requested_by uuid [not null] // operador
+  specialist_id uuid // pode ser null até ser atribuído
+
+  status varchar [note: 'PENDING | IN_PROGRESS | APPROVED | REJECTED']
+
+  notes text
+
+  created_at timestamp
+  reviewed_at timestamp
+}
+
+// =======================================
+// PLANNED SENSORS (DEFINIÇÃO TÉCNICA)
+// =======================================
+
+Table planned_sensors {
+  id uuid [primary key]
+
+  plan_id uuid [not null]
+
+  name varchar
+  type varchar [note: 'TEMPERATURE | SOIL_HUMIDITY | AIR_HUMIDITY | LUMINOSITY']
+  position varchar [note: 'NORTE | SUL | LESTE | OESTE | CENTRO']
+
+  created_at timestamp
+}
+
+// =======================================
+// SENSORS (APÓS APROVAÇÃO)
+// =======================================
+
+Table sensors {
+  id uuid [primary key]
+
+  name varchar
+  type varchar
+  position varchar
+
+  area_id uuid [not null]
+
+  is_active boolean
+
+  created_at timestamp
+}
+
+// =======================================
+// SENSOR READINGS (TIME SERIES)
+// =======================================
+
+Table sensor_readings {
+  id uuid [primary key]
+
+  sensor_id uuid [not null]
+
+  value double [not null]
+  recorded_at timestamp [not null]
+  created_at timestamp
+
+  Indexes {
+    (sensor_id, recorded_at)
+    (recorded_at)
+  }
+}
+
+// =======================================
+// RULES
+// =======================================
+
+Table rules {
+  id uuid [primary key]
+
+  name varchar
+  operator varchar [note: '> | < | >= | <= | = | !=']
+  threshold double
+  is_active boolean
+
+  sensor_id uuid [not null]
+  user_id uuid [not null]
+
+  created_at timestamp
+}
+
+// =======================================
+// ALERTS
+// =======================================
+
+Table alerts {
+  id uuid [primary key]
+
+  sensor_id uuid [not null]
+  rule_id uuid [not null]
+
+  value double [not null]
+
+  message varchar
+  status varchar [note: 'ACTIVE | RESOLVED']
+
+  triggered_at timestamp
+  resolved_at timestamp
+}
+
+// =======================================
+// RELATIONSHIPS
+// =======================================
+
+// usuário → áreas
+Ref: areas.user_id > users.id
+
+// sensor plan
+Ref: sensor_plans.area_id > areas.id
+Ref: sensor_plans.requested_by > users.id
+Ref: sensor_plans.specialist_id > users.id
+
+// planned sensors
+Ref: planned_sensors.plan_id > sensor_plans.id
+
+// sensores reais
+Ref: sensors.area_id > areas.id
+
+// leituras
+Ref: sensor_readings.sensor_id > sensors.id
+
+// regras
+Ref: rules.sensor_id > sensors.id
+Ref: rules.user_id > users.id
+
+// alertas
+Ref: alerts.sensor_id > sensors.id
+Ref: alerts.rule_id > rules.id
