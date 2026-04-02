@@ -1,0 +1,47 @@
+# Maven/Java build
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDEs/editors
+.idea/
+*.iml
+.vscode/
+
+# Eclipse/STS
+.classpath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code Java extension cache
+.classpath
+.factorypath
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# Environment/local config
+.env
+.env.*
+
+# H2 local files (if switched from in-memory)
+*.mv.db
+*.trace.db

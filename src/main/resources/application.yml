@@ -1,0 +1,23 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:agrotech
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+app:
+  jwt:
+    secret: 1f6407577f4dca31e3ce53f0fa27ea91a2853de889598ed5f3174b2a8b1ce064
+    access-token-expiration-ms: 900000
+    refresh-token-expiration-ms: 604800000
