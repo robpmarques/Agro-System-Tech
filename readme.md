@@ -145,12 +145,26 @@ Sensores reais criados após aprovação do plano.
 
 ---
 
-## Segurança e Acesso
+## Regras de Segurança e Acesso
 
-* Usuário só pode acessar suas próprias áreas
-* Operador só pode aprovar seus próprios planos
-* Especialista só pode editar planos atribuídos a ele
-* Especialista pode atribuir planos a ele
+- RN01: usuário só pode acessar suas próprias áreas.
+- RN02: operador só pode aprovar ou rejeitar planos que pertencem a ele.
+- RN03: especialista só pode editar planos atribuídos a ele.
+- RN04: especialista pode se autoatribuir a um plano pendente.
+
+## Regras de Workflow dos Planos
+
+- RN05: todo plano inicia com status PENDING.
+- RN06: ao atribuir especialista, o plano muda para IN_PROGRESS.
+- RN07: um plano em IN_PROGRESS pode ser APPROVED ou REJECTED pelo operador dono.
+- RN08: um plano REJECTED pode retornar para IN_PROGRESS quando houver nova atuação de especialista.
+
+## Regras de Execução e Monitoramento
+
+- RN09: somente planos APPROVED podem gerar sensores reais.
+- RN10: leituras de sensores devem ser registradas com timestamp.
+- RN11: regras ativas devem ser avaliadas para cada leitura registrada.
+- RN12: ao violar uma regra, um alerta deve ser criado automaticamente.
 
 ---
 

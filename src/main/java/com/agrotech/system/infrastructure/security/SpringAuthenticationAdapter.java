@@ -1,7 +1,7 @@
 package com.agrotech.system.infrastructure.security;
 
-import com.agrotech.system.application.exception.UnauthorizedException;
 import com.agrotech.system.application.port.out.AuthenticationPort;
+import com.agrotech.system.domain.exception.UnauthorizedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Component;

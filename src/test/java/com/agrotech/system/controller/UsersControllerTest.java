@@ -1,7 +1,6 @@
 package com.agrotech.system.controller;
 
-import com.agrotech.system.repository.RefreshTokenRepository;
-import com.agrotech.system.repository.UserRepository;
+import com.agrotech.system.infrastructure.persistence.repo.UserJpaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,8 +23,7 @@ class UsersControllerTest {
 
     @Autowired MockMvc mockMvc;
     @Autowired ObjectMapper objectMapper;
-    @Autowired UserRepository userRepository;
-    @Autowired RefreshTokenRepository refreshTokenRepository;
+    @Autowired UserJpaRepository userRepository;
 
     private String tokenAdmin;
     private String tokenOperador;
@@ -33,7 +31,6 @@ class UsersControllerTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        refreshTokenRepository.deleteAll();
         userRepository.deleteAll();
         tokenAdmin       = getToken("admin@rbac.com",  "ADMIN");
         tokenOperador    = getToken("op@rbac.com",     "OPERADOR");

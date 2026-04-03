@@ -1,11 +1,10 @@
 package com.agrotech.system.controller;
 
 import com.agrotech.system.application.port.in.AuthUseCase;
+import com.agrotech.system.domain.model.User;
 import com.agrotech.system.dto.AuthResponse;
 import com.agrotech.system.dto.LoginRequest;
-import com.agrotech.system.dto.RefreshRequest;
 import com.agrotech.system.dto.RegisterRequest;
-import com.agrotech.system.model.User;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,17 +39,6 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<User> me(Authentication authentication) {
         return ResponseEntity.ok(authUseCase.me(authentication.getName()));
-    }
-
-    @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshRequest request) {
-        return ResponseEntity.ok(authUseCase.refresh(request.refreshToken()));
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@Valid @RequestBody RefreshRequest request) {
-        authUseCase.logout(request.refreshToken());
-        return ResponseEntity.noContent().build();
     }
 }
 

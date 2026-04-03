@@ -1,7 +1,7 @@
 package com.agrotech.system.controller;
 
 import com.agrotech.system.application.port.in.AuthUseCase;
-import com.agrotech.system.model.User;
+import com.agrotech.system.domain.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

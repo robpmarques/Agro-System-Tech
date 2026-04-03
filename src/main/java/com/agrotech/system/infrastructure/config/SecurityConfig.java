@@ -1,4 +1,4 @@
-package com.agrotech.system.config;
+package com.agrotech.system.infrastructure.config;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
@@ -50,12 +50,12 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(ex -> ex
-                .authenticationEntryPoint(authenticationEntryPoint())
-                .accessDeniedHandler(accessDeniedHandler())
-            )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authenticationEntryPoint())
+                        .accessDeniedHandler(accessDeniedHandler())
+                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/refresh", "/api/auth/logout", "/h2-console/**").permitAll()
+                    .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                         .requestMatchers("/api/users/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/users/especialista/**").hasAnyRole("ESPECIALISTA", "ADMIN")
                         .requestMatchers("/api/users/operador/**").hasAnyRole("OPERADOR", "ESPECIALISTA", "ADMIN")

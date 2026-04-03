@@ -1,40 +1,40 @@
-package com.agrotech.system.application.service;
+package com.agrotech.system.application.usecase;
 
-import com.agrotech.system.application.exception.ConflictException;
-import com.agrotech.system.application.exception.NotFoundException;
-import com.agrotech.system.application.exception.UnauthorizedException;
 import com.agrotech.system.application.port.in.AuthUseCase;
 import com.agrotech.system.application.port.out.AccessTokenPort;
 import com.agrotech.system.application.port.out.AuthenticationPort;
 import com.agrotech.system.application.port.out.PasswordHashPort;
-import com.agrotech.system.application.port.out.RefreshTokenPort;
 import com.agrotech.system.application.port.out.UserPort;
+import com.agrotech.system.domain.exception.ConflictException;
+import com.agrotech.system.domain.exception.NotFoundException;
+import com.agrotech.system.domain.exception.UnauthorizedException;
+import com.agrotech.system.domain.model.Role;
+import com.agrotech.system.domain.model.User;
+import com.agrotech.system.domain.service.UserDomainService;
 import com.agrotech.system.dto.AuthResponse;
-import com.agrotech.system.model.RefreshToken;
-import com.agrotech.system.model.Role;
-import com.agrotech.system.model.User;
 
 import java.util.List;
-public class AuthApplicationService implements AuthUseCase {
+
+public class AuthUseCaseImpl implements AuthUseCase {
 
     private final UserPort userPort;
     private final PasswordHashPort passwordHashPort;
     private final AuthenticationPort authenticationPort;
     private final AccessTokenPort accessTokenPort;
-    private final RefreshTokenPort refreshTokenPort;
+    private final UserDomainService userDomainService;
 
-    public AuthApplicationService(
+    public AuthUseCaseImpl(
             UserPort userPort,
             PasswordHashPort passwordHashPort,
             AuthenticationPort authenticationPort,
             AccessTokenPort accessTokenPort,
-            RefreshTokenPort refreshTokenPort
+            UserDomainService userDomainService
     ) {
         this.userPort = userPort;
         this.passwordHashPort = passwordHashPort;
         this.authenticationPort = authenticationPort;
         this.accessTokenPort = accessTokenPort;
-        this.refreshTokenPort = refreshTokenPort;
+        this.userDomainService = userDomainService;
     }
 
     @Override
@@ -43,19 +43,12 @@ public class AuthApplicationService implements AuthUseCase {
             throw new ConflictException("Email ja cadastrado");
         }
 
-        User user = new User();
-        user.setName(name);
-        user.setEmail(email);
-        user.setPassword(passwordHashPort.hash(password));
-        user.setRole(role == null ? Role.OPERADOR : role);
-
+        User user = userDomainService.createUser(name, email, passwordHashPort.hash(password), role);
         User savedUser = userPort.save(user);
         String accessToken = accessTokenPort.generateAccessToken(savedUser);
-        String refreshToken = refreshTokenPort.create(savedUser).getToken();
 
         return new AuthResponse(
                 accessToken,
-                refreshToken,
                 "Bearer",
                 savedUser.getId(),
                 savedUser.getName(),
@@ -72,39 +65,15 @@ public class AuthApplicationService implements AuthUseCase {
                 .orElseThrow(() -> new UnauthorizedException("Credenciais invalidas"));
 
         String accessToken = accessTokenPort.generateAccessToken(user);
-        String refreshToken = refreshTokenPort.create(user).getToken();
 
         return new AuthResponse(
                 accessToken,
-                refreshToken,
                 "Bearer",
                 user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getRole()
         );
-    }
-
-    @Override
-    public AuthResponse refresh(String refreshToken) {
-        RefreshToken newRt = refreshTokenPort.rotate(refreshToken);
-        User user = newRt.getUser();
-        String accessToken = accessTokenPort.generateAccessToken(user);
-
-        return new AuthResponse(
-                accessToken,
-                newRt.getToken(),
-                "Bearer",
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getRole()
-        );
-    }
-
-    @Override
-    public void logout(String refreshToken) {
-        refreshTokenPort.revoke(refreshToken);
     }
 
     @Override

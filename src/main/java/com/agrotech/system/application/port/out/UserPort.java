@@ -1,6 +1,6 @@
 package com.agrotech.system.application.port.out;
 
-import com.agrotech.system.model.User;
+import com.agrotech.system.domain.model.User;
 
 import java.util.List;
 import java.util.Optional;

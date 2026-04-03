@@ -1,18 +1,19 @@
 // =======================================
 // AGROTECH SYSTEM - DBML
-// =======================================
-
-// =======================================
-// USERS
+// Regras de modelagem:
+// RG01: todas as PKs sao UUID
+// RG02: timestamps usam timezone (timestamptz)
+// RG03: FKs obrigatorias sao not null
+// RG04: status e roles documentados por notas
 // =======================================
 
 Table users {
   id uuid [primary key]
-  name varchar
+  name varchar [not null]
   email varchar [unique, not null]
   password varchar [not null]
-  role varchar [note: 'ADMIN | OPERADOR | ESPECIALISTA']
-  created_at timestamp
+  role varchar [not null, note: 'ADMIN | OPERADOR | ESPECIALISTA']
+  created_at timestamptz [not null]
 }
 
 // =======================================
@@ -21,13 +22,13 @@ Table users {
 
 Table areas {
   id uuid [primary key]
-  name varchar
-  location varchar
-  size double
+  name varchar [not null]
+  location varchar [not null]
+  size double [not null]
 
   user_id uuid [not null] // dono (OPERADOR)
 
-  created_at timestamp
+  created_at timestamptz [not null]
 }
 
 // =======================================
@@ -41,12 +42,12 @@ Table sensor_plans {
   requested_by uuid [not null] // operador
   specialist_id uuid // pode ser null até ser atribuído
 
-  status varchar [note: 'PENDING | IN_PROGRESS | APPROVED | REJECTED']
+  status varchar [not null, note: 'PENDING | IN_PROGRESS | APPROVED | REJECTED']
 
   notes text
 
-  created_at timestamp
-  reviewed_at timestamp
+  created_at timestamptz [not null]
+  reviewed_at timestamptz
 }
 
 // =======================================
@@ -58,11 +59,11 @@ Table planned_sensors {
 
   plan_id uuid [not null]
 
-  name varchar
-  type varchar [note: 'TEMPERATURE | SOIL_HUMIDITY | AIR_HUMIDITY | LUMINOSITY']
-  position varchar [note: 'NORTE | SUL | LESTE | OESTE | CENTRO']
+  name varchar [not null]
+  type varchar [not null, note: 'TEMPERATURE | SOIL_HUMIDITY | AIR_HUMIDITY | LUMINOSITY']
+  position varchar [not null, note: 'NORTE | SUL | LESTE | OESTE | CENTRO']
 
-  created_at timestamp
+  created_at timestamptz [not null]
 }
 
 // =======================================
@@ -72,15 +73,15 @@ Table planned_sensors {
 Table sensors {
   id uuid [primary key]
 
-  name varchar
-  type varchar
-  position varchar
+  name varchar [not null]
+  type varchar [not null]
+  position varchar [not null]
 
   area_id uuid [not null]
 
-  is_active boolean
+  is_active boolean [not null]
 
-  created_at timestamp
+  created_at timestamptz [not null]
 }
 
 // =======================================
@@ -93,8 +94,8 @@ Table sensor_readings {
   sensor_id uuid [not null]
 
   value double [not null]
-  recorded_at timestamp [not null]
-  created_at timestamp
+  recorded_at timestamptz [not null]
+  created_at timestamptz [not null]
 
   Indexes {
     (sensor_id, recorded_at)
@@ -109,15 +110,15 @@ Table sensor_readings {
 Table rules {
   id uuid [primary key]
 
-  name varchar
-  operator varchar [note: '> | < | >= | <= | = | !=']
-  threshold double
-  is_active boolean
+  name varchar [not null]
+  operator varchar [not null, note: '> | < | >= | <= | = | !=']
+  threshold double [not null]
+  is_active boolean [not null]
 
   sensor_id uuid [not null]
   user_id uuid [not null]
 
-  created_at timestamp
+  created_at timestamptz [not null]
 }
 
 // =======================================
@@ -132,11 +133,11 @@ Table alerts {
 
   value double [not null]
 
-  message varchar
-  status varchar [note: 'ACTIVE | RESOLVED']
+  message varchar [not null]
+  status varchar [not null, note: 'ACTIVE | RESOLVED']
 
-  triggered_at timestamp
-  resolved_at timestamp
+  triggered_at timestamptz [not null]
+  resolved_at timestamptz
 }
 
 // =======================================

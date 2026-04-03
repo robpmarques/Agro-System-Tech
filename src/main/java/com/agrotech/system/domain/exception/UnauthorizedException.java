@@ -1,4 +1,4 @@
-package com.agrotech.system.application.exception;
+package com.agrotech.system.domain.exception;
 
 public class UnauthorizedException extends RuntimeException {
     public UnauthorizedException(String message) {

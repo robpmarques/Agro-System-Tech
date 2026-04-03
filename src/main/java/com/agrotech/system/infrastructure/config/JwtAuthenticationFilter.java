@@ -1,6 +1,6 @@
-package com.agrotech.system.config;
+package com.agrotech.system.infrastructure.config;
 
-import com.agrotech.system.service.JwtService;
+import com.agrotech.system.infrastructure.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

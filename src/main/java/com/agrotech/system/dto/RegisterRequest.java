@@ -1,6 +1,6 @@
 package com.agrotech.system.dto;
 
-import com.agrotech.system.model.Role;
+import com.agrotech.system.domain.model.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

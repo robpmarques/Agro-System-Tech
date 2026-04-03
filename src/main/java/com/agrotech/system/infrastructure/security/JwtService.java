@@ -1,6 +1,6 @@
-package com.agrotech.system.service;
+package com.agrotech.system.infrastructure.security;
 
-import com.agrotech.system.model.Role;
+import com.agrotech.system.domain.model.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;

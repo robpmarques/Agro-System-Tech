@@ -1,8 +1,7 @@
 package com.agrotech.system.infrastructure.security;
 
 import com.agrotech.system.application.port.out.AccessTokenPort;
-import com.agrotech.system.model.User;
-import com.agrotech.system.service.JwtService;
+import com.agrotech.system.domain.model.User;
 import org.springframework.stereotype.Component;
 
 @Component

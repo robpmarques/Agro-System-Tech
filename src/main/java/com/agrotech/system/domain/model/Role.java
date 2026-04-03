@@ -1,4 +1,4 @@
-package com.agrotech.system.model;
+package com.agrotech.system.domain.model;
 
 public enum Role {
     OPERADOR,
