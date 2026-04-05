@@ -76,6 +76,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.agrotech.system.AgroTechSystemApplication</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>

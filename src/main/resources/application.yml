@@ -3,17 +3,17 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/agrotech
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/agrotech}
     driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: password
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
   jpa:
     hibernate:
       ddl-auto: update
     open-in-view: false
 
+
 app:
   jwt:
     secret: 1f6407577f4dca31e3ce53f0fa27ea91a2853de889598ed5f3174b2a8b1ce064
     access-token-expiration-ms: 900000
-    refresh-token-expiration-ms: 604800000
