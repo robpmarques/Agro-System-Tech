@@ -151,6 +151,11 @@ Sensores reais criados após aprovação do plano.
 - RN02: operador só pode aprovar ou rejeitar planos que pertencem a ele.
 - RN03: especialista só pode editar planos atribuídos a ele.
 - RN04: especialista pode se autoatribuir a um plano pendente.
+- 
+- RN05: Admin não pode alterar áreas dos operadores
+- RN06: Admin não pode criar novas áreas
+- RN07: Admin pode criar novos usuários especialistas
+
 
 ## Regras de Workflow dos Planos
 
