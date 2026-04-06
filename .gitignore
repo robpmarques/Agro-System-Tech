@@ -41,6 +41,7 @@ Thumbs.db
 # Environment/local config
 .env
 .env.*
+!.env.example
 
 # H2 local files (if switched from in-memory)
 *.mv.db
