@@ -11,7 +11,6 @@ public class UserDomainService {
         user.setEmail(email);
         user.setPassword(hashedPassword);
         user.setRole(role == null ? Role.OPERADOR : role);
-        user.setActive(true);
         return user;
     }
 }

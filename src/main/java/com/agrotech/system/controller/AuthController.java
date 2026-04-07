@@ -5,6 +5,7 @@ import com.agrotech.system.domain.model.User;
 import com.agrotech.system.dto.AuthResponse;
 import com.agrotech.system.dto.LoginRequest;
 import com.agrotech.system.dto.RegisterRequest;
+import com.agrotech.system.infrastructure.security.AuthenticatedUser;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,9 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<User> me(Authentication authentication) {
+        if (authentication.getPrincipal() instanceof AuthenticatedUser user) {
+            return ResponseEntity.ok(authUseCase.me(user.email()));
+        }
         return ResponseEntity.ok(authUseCase.me(authentication.getName()));
     }
 }

@@ -2,10 +2,9 @@ package com.agrotech.system.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.util.UUID;
-
 public class User {
-    private UUID id;
+
+    private Long id;
     private String name;
     private String email;
 
@@ -15,11 +14,11 @@ public class User {
     private Role role;
     private boolean active = true;
 
-    public UUID getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
