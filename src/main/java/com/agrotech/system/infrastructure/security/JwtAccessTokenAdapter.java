@@ -15,6 +15,6 @@ public class JwtAccessTokenAdapter implements AccessTokenPort {
 
     @Override
     public String generateAccessToken(User user) {
-        return jwtService.generateAccessToken(user.getEmail(), user.getRole());
+        return jwtService.generateAccessToken(user.getEmail(), user.getRole(), user.getId());
     }
 }

@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Service
@@ -28,10 +29,20 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public String generateAccessToken(String username, Role role) {
+    public String generateAccessToken(String username, Role role, UUID userId) {
         Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("userId", userId.toString());
+        extraClaims.put("role", role.name());
         extraClaims.put("roles", java.util.List.of("ROLE_" + role.name()));
         return buildToken(extraClaims, username, accessTokenExpirationMs);
+    }
+
+    public UUID extractUserId(String token) {
+        return UUID.fromString(extractClaim(token, claims -> claims.get("userId", String.class)));
+    }
+
+    public Role extractRole(String token) {
+        return Role.valueOf(extractClaim(token, claims -> claims.get("role", String.class)));
     }
 
     public boolean isTokenValid(String token, String expectedUsername) {
