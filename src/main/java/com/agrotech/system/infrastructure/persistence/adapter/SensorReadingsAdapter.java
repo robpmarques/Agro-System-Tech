@@ -1,19 +1,21 @@
 package com.agrotech.system.infrastructure.persistence.adapter;
 
 import com.agrotech.system.application.port.out.SensorReadingPort;
-import com.agrotech.system.domain.model.Sensor;
 import com.agrotech.system.domain.model.SensorReading;
 import com.agrotech.system.infrastructure.persistence.entity.SensorEntity;
 import com.agrotech.system.infrastructure.persistence.entity.SensorReadings;
 import com.agrotech.system.infrastructure.persistence.repo.SensorReadingsRepository;
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SensorReadingsAdapter implements SensorReadingPort {
     private final SensorReadingsRepository sensorReadingsRepository;
+    private final EntityManager entityManager;
 
-    public SensorReadingsAdapter(SensorReadingsRepository sensorReadingsRepository) {
+    public SensorReadingsAdapter(SensorReadingsRepository sensorReadingsRepository, EntityManager entityManager) {
         this.sensorReadingsRepository = sensorReadingsRepository;
+        this.entityManager = entityManager;
     }
 
     @Override
@@ -35,8 +37,7 @@ public class SensorReadingsAdapter implements SensorReadingPort {
     }
 
     private SensorReadings toEntity(SensorReading domain) {
-        SensorEntity sensor = new SensorEntity();
-        sensor.setId(domain.getSensorId());
+        SensorEntity sensor = entityManager.getReference(SensorEntity.class, domain.getSensorId());
 
         SensorReadings entity = new SensorReadings();
         entity.setId(domain.getId());
