@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,7 +50,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(authenticationEntryPoint())
@@ -57,15 +59,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                         .requestMatchers("/api/areas/**").hasAnyRole("OPERADOR", "ADMIN")
-                        .requestMatchers("/api/users/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/users/especialista/**").hasAnyRole("ESPECIALISTA", "ADMIN")
-                        .requestMatchers("/api/users/operador/**").hasAnyRole("OPERADOR", "ESPECIALISTA", "ADMIN")
-                        .requestMatchers("/api/users").hasRole("ADMIN")
-                        .requestMatchers("/api/auth/me").authenticated()
-                        .anyRequest().authenticated()
+                    .requestMatchers("/api/areas/**").hasAnyRole("OPERADOR", "ADMIN")
+                    .requestMatchers("/api/readings").permitAll()
+                    .requestMatchers("/api/users/admin/**").hasRole("ADMIN")
+                    .requestMatchers("/api/users/especialista/**").hasAnyRole("ESPECIALISTA", "ADMIN")
+                    .requestMatchers("/api/users/operador/**").hasAnyRole("OPERADOR", "ESPECIALISTA", "ADMIN")
+                    .requestMatchers("/api/users").hasRole("ADMIN")
+                    .requestMatchers("/api/auth/me").authenticated()
+                    .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .headers(headers -> headers.frameOptions(frame -> frame.disable()));
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
 
         return http.build();
     }
