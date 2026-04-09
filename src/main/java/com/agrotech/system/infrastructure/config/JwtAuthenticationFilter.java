@@ -1,6 +1,7 @@
 package com.agrotech.system.infrastructure.config;
 
 import com.agrotech.system.infrastructure.security.JwtService;
+import com.agrotech.system.infrastructure.security.AuthenticatedUser;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,8 +41,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String jwt = authHeader.substring(7);
         String username;
+        AuthenticatedUser principal;
         try {
             username = jwtService.extractUsername(jwt);
+            principal = new AuthenticatedUser(
+                    jwtService.extractUserId(jwt),
+                    username,
+                    jwtService.extractRole(jwt)
+            );
         } catch (Exception ex) {
             filterChain.doFilter(request, response);
             return;
@@ -55,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .toList();
                 User userDetails = new User(username, "", authorities);
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
+                        principal,
                         null,
                         authorities
                 );

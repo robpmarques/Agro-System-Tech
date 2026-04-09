@@ -1,10 +1,7 @@
 package com.agrotech.system.infrastructure.persistence.entity;
 
-import com.agrotech.system.domain.model.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,8 +11,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
-public class UserEntity {
+@Table(name = "areas")
+public class AreaJpaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -24,18 +21,17 @@ public class UserEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    @Column(nullable = false)
+    private String location;
 
     @Column(nullable = false)
-    private String password;
+    private double size;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+    @Column(name = "user_id", nullable = false)
+    private UUID userId;
 
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt = Instant.now();
+    private Instant createdAt;
 
     public UUID getId() {
         return id;
@@ -53,28 +49,28 @@ public class UserEntity {
         this.name = name;
     }
 
-    public String getEmail() {
-        return email;
+    public String getLocation() {
+        return location;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
-    public String getPassword() {
-        return password;
+    public double getSize() {
+        return size;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setSize(double size) {
+        this.size = size;
     }
 
-    public Role getRole() {
-        return role;
+    public UUID getUserId() {
+        return userId;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
+    public void setUserId(UUID userId) {
+        this.userId = userId;
     }
 
     public Instant getCreatedAt() {
@@ -85,3 +81,4 @@ public class UserEntity {
         this.createdAt = createdAt;
     }
 }
+
