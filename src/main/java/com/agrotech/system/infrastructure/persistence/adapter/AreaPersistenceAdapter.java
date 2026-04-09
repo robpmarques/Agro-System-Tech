@@ -45,6 +45,11 @@ public class AreaPersistenceAdapter implements AreaRepositoryPort {
     }
 
     @Override
+    public List<UUID> findAreaIdsByUserId(UUID userId) {
+        return areaJpaRepository.findAreaIdsByUserId(userId);
+    }
+
+    @Override
     public long countByUserId(UUID userId) {
         return areaJpaRepository.countByUserId(userId);
     }

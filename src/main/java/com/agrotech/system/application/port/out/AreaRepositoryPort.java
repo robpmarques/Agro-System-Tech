@@ -11,6 +11,7 @@ public interface AreaRepositoryPort {
     Optional<Area> findById(UUID id);
     Optional<Area> findByIdAndUserId(UUID id, UUID userId);
     List<Area> findAllByUserId(UUID userId, int page, int size, String sortBy, boolean ascending);
+    List<UUID> findAreaIdsByUserId(UUID userId);
     long countByUserId(UUID userId);
     List<Area> findAll(int page, int size, String sortBy, boolean ascending);
     long countAll();
