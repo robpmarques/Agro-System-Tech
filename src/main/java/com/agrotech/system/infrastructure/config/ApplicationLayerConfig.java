@@ -1,11 +1,17 @@
 package com.agrotech.system.infrastructure.config;
 
 import com.agrotech.system.application.port.in.AuthUseCase;
+import com.agrotech.system.application.port.in.SensorReadingUseCase;
 import com.agrotech.system.application.port.out.AccessTokenPort;
+import com.agrotech.system.application.port.out.AreaRepositoryPort;
 import com.agrotech.system.application.port.out.AuthenticationPort;
 import com.agrotech.system.application.port.out.PasswordHashPort;
+import com.agrotech.system.application.port.out.SensorPort;
+import com.agrotech.system.application.port.out.SensorReadingPort;
 import com.agrotech.system.application.port.out.UserPort;
+import com.agrotech.system.application.usecase.AreaUseCase;
 import com.agrotech.system.application.usecase.AuthUseCaseImpl;
+import com.agrotech.system.application.usecase.SensorReadingImpl;
 import com.agrotech.system.domain.service.UserDomainService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,5 +39,18 @@ public class ApplicationLayerConfig {
                 accessTokenPort,
                 userDomainService
         );
+    }
+
+    @Bean
+    public AreaUseCase areaUseCase(AreaRepositoryPort areaRepositoryPort) {
+        return new AreaUseCase(areaRepositoryPort);
+    }
+
+    @Bean
+    public SensorReadingUseCase sensorReadingUseCase(
+            SensorReadingPort sensorReadingPort,
+            SensorPort sensorPort
+    ) {
+        return new SensorReadingImpl(sensorReadingPort, sensorPort);
     }
 }
