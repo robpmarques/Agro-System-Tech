@@ -14,6 +14,8 @@ spring:
 
 
 app:
+  sensor-reading-scheduler:
+    fixed-delay-ms: ${SENSOR_READING_SCHEDULER_DELAY_MS:30000}
   jwt:
     secret: 1f6407577f4dca31e3ce53f0fa27ea91a2853de889598ed5f3174b2a8b1ce064
     access-token-expiration-ms: 900000

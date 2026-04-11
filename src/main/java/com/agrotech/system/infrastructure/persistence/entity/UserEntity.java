@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Entity
@@ -33,8 +34,8 @@ public class UserEntity {
     @Column(nullable = false)
     private Role role;
 
-    @Column(nullable = false)
-    private boolean active = true;
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt = Instant.now();
 
     public UUID getId() {
         return id;
@@ -76,11 +77,11 @@ public class UserEntity {
         this.role = role;
     }
 
-    public boolean isActive() {
-        return active;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
-    public void setActive(boolean active) {
-        this.active = active;
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 }

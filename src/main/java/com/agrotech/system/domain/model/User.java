@@ -3,7 +3,6 @@ package com.agrotech.system.domain.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.UUID;
-
 public class User {
 
     private UUID id;
@@ -14,7 +13,6 @@ public class User {
     private String password;
 
     private Role role;
-    private boolean active = true;
 
     public UUID getId() {
         return id;
@@ -56,11 +54,4 @@ public class User {
         this.role = role;
     }
 
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
 }
