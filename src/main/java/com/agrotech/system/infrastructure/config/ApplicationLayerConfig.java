@@ -14,10 +14,15 @@ import com.agrotech.system.application.port.in.sensor.GetSensorByIdUseCase;
 import com.agrotech.system.application.port.in.sensor.ListSensorsUseCase;
 import com.agrotech.system.application.port.in.sensor.UpdateSensorActivationUseCase;
 import com.agrotech.system.application.port.in.sensor.UpdateSensorUseCase;
+import com.agrotech.system.application.port.in.rule.CreateRuleUseCase;
+import com.agrotech.system.application.port.in.rule.DeleteRuleUseCase;
+import com.agrotech.system.application.port.in.rule.ListRulesBySensorUseCase;
+import com.agrotech.system.application.port.in.rule.UpdateRuleUseCase;
 import com.agrotech.system.application.port.out.AccessTokenPort;
 import com.agrotech.system.application.port.out.AreaRepositoryPort;
 import com.agrotech.system.application.port.out.AuthenticationPort;
 import com.agrotech.system.application.port.out.PasswordHashPort;
+import com.agrotech.system.application.port.out.RulePort;
 import com.agrotech.system.application.port.out.SensorPort;
 import com.agrotech.system.application.port.out.SensorReadingPort;
 import com.agrotech.system.application.port.out.UserPort;
@@ -26,6 +31,7 @@ import com.agrotech.system.application.usecase.AuthUseCaseImpl;
 import com.agrotech.system.application.usecase.SensorReadingImpl;
 import com.agrotech.system.application.usecase.SensorReadingSimulationUseCaseImpl;
 import com.agrotech.system.application.usecase.SensorUseCase;
+import com.agrotech.system.application.usecase.RuleUseCase;
 import com.agrotech.system.domain.service.UserDomainService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -137,5 +143,36 @@ public class ApplicationLayerConfig {
     @Bean
     public DeleteSensorUseCase deleteSensorUseCase(SensorUseCase sensorUseCase) {
         return sensorUseCase;
+    }
+
+    @Bean
+    public RuleUseCase ruleUseCase(
+            RulePort rulePort,
+            SensorPort sensorPort,
+            AreaRepositoryPort areaRepositoryPort
+    ) {
+        return new RuleUseCase(rulePort, sensorPort, areaRepositoryPort);
+    }
+
+    @Bean
+    public CreateRuleUseCase createRuleUseCase(RuleUseCase ruleUseCase) {
+        return ruleUseCase;
+    }
+
+    @Bean
+    public ListRulesBySensorUseCase listRulesBySensorUseCase(RuleUseCase ruleUseCase) {
+        return ruleUseCase;
+    }
+
+    @Bean
+    public UpdateRuleUseCase updateRuleUseCase(RuleUseCase ruleUseCase) {
+        return (command, currentUserId, currentRole) ->
+                ruleUseCase.update(command, currentUserId, currentRole);
+    }
+
+    @Bean
+    public DeleteRuleUseCase deleteRuleUseCase(RuleUseCase ruleUseCase) {
+        return (ruleId, currentUserId, currentRole) ->
+                ruleUseCase.delete(ruleId, currentUserId, currentRole);
     }
 }
