@@ -12,6 +12,8 @@ import com.agrotech.system.domain.model.SensorReading;
 import com.agrotech.system.dto.SensorReadingRequest;
 import com.agrotech.system.dto.SensorReadingResponse;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public class SensorReadingImpl implements SensorReadingUseCase {
@@ -60,6 +62,45 @@ public class SensorReadingImpl implements SensorReadingUseCase {
         );
     }
 
+    @Override
+    public SensorReadingResponse getLatestReading(UUID sensorId, UUID currentUserId, Role currentRole) {
+        ensureOperatorOrAdmin(currentRole);
+        Sensor sensor = sensorPort.findById(sensorId)
+                .orElseThrow(() -> new NotFoundException("Sensor nao encontrado"));
+        ensureVisibleArea(sensor.getAreaId(), currentUserId, currentRole);
+
+        SensorReading latest = sensorReadingPort.findLatestBySensorId(sensorId)
+                .orElseThrow(() -> new NotFoundException("Leitura nao encontrada"));
+        return toResponse(latest);
+    }
+
+    @Override
+    public List<SensorReadingResponse> listReadings(
+            UUID sensorId,
+            Instant startDate,
+            Instant endDate,
+            UUID currentUserId,
+            Role currentRole
+    ) {
+        ensureOperatorOrAdmin(currentRole);
+        Sensor sensor = sensorPort.findById(sensorId)
+                .orElseThrow(() -> new NotFoundException("Sensor nao encontrado"));
+        ensureVisibleArea(sensor.getAreaId(), currentUserId, currentRole);
+
+        if ((startDate == null) != (endDate == null)) {
+            throw new IllegalArgumentException("startDate e endDate devem ser informados juntos");
+        }
+        if (startDate != null && endDate.isBefore(startDate)) {
+            throw new IllegalArgumentException("endDate deve ser maior ou igual a startDate");
+        }
+
+        List<SensorReading> readings = startDate == null
+                ? sensorReadingPort.findBySensorId(sensorId)
+                : sensorReadingPort.findBySensorIdAndRecordedAtBetween(sensorId, startDate, endDate);
+
+        return readings.stream().map(this::toResponse).toList();
+    }
+
     private void ensureOperatorOrAdmin(Role role) {
         if (role != Role.OPERADOR && role != Role.ADMIN) {
             throw new ForbiddenException("Perfil sem permissao para registrar leituras manuais");
@@ -75,5 +116,16 @@ public class SensorReadingImpl implements SensorReadingUseCase {
 
         areaRepositoryPort.findByIdAndUserId(areaId, currentUserId)
                 .orElseThrow(() -> new NotFoundException("Sensor nao encontrado"));
+    }
+
+    private SensorReadingResponse toResponse(SensorReading reading) {
+        return new SensorReadingResponse(
+                reading.getId(),
+                reading.getSensorId(),
+                reading.getValue(),
+                reading.getRecordedAt(),
+                reading.getCreatedAt(),
+                reading.getData()
+        );
     }
 }
