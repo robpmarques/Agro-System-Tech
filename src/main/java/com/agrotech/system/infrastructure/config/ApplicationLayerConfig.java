@@ -94,9 +94,10 @@ public class ApplicationLayerConfig {
     @Bean
     public SensorReadingUseCase sensorReadingUseCase(
             SensorReadingPort sensorReadingPort,
-            SensorPort sensorPort
+            SensorPort sensorPort,
+            AreaRepositoryPort areaRepositoryPort
     ) {
-        return new SensorReadingImpl(sensorReadingPort, sensorPort);
+        return new SensorReadingImpl(sensorReadingPort, sensorPort, areaRepositoryPort);
     }
 
     @Bean
