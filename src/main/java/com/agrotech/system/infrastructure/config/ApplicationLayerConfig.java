@@ -22,6 +22,7 @@ import com.agrotech.system.application.port.in.rule.ListRulesBySensorUseCase;
 import com.agrotech.system.application.port.in.rule.UpdateRuleUseCase;
 import com.agrotech.system.application.port.out.AccessTokenPort;
 import com.agrotech.system.application.port.out.AlertPort;
+import com.agrotech.system.application.port.out.AlertRealtimePort;
 import com.agrotech.system.application.port.out.AreaRepositoryPort;
 import com.agrotech.system.application.port.out.AuthenticationPort;
 import com.agrotech.system.application.port.out.PasswordHashPort;
@@ -38,8 +39,11 @@ import com.agrotech.system.application.usecase.SensorReadingSimulationUseCaseImp
 import com.agrotech.system.application.usecase.SensorUseCase;
 import com.agrotech.system.application.usecase.RuleUseCase;
 import com.agrotech.system.domain.service.UserDomainService;
+import com.agrotech.system.infrastructure.websocket.AlertWebSocketPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 @Configuration
 public class ApplicationLayerConfig {
@@ -118,9 +122,16 @@ public class ApplicationLayerConfig {
     @Bean
     public AlertEvaluationService alertEvaluationService(
             RulePort rulePort,
-            AlertPort alertPort
+            AlertPort alertPort,
+            AlertRealtimePort alertRealtimePort
     ) {
-        return new AlertEvaluationService(rulePort, alertPort);
+        return new AlertEvaluationService(rulePort, alertPort, alertRealtimePort);
+    }
+
+    @Bean
+    @Lazy
+    public AlertRealtimePort alertRealtimePort(SimpMessagingTemplate messagingTemplate) {
+        return new AlertWebSocketPublisher(messagingTemplate);
     }
 
     @Bean
@@ -195,10 +206,11 @@ public class ApplicationLayerConfig {
     @Bean
     public AlertUseCase alertUseCase(
             AlertPort alertPort,
+            AlertRealtimePort alertRealtimePort,
             SensorPort sensorPort,
             AreaRepositoryPort areaRepositoryPort
     ) {
-        return new AlertUseCase(alertPort, sensorPort, areaRepositoryPort);
+        return new AlertUseCase(alertPort, alertRealtimePort, sensorPort, areaRepositoryPort);
     }
 
     @Bean

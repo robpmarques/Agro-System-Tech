@@ -1,6 +1,7 @@
 package com.agrotech.system.application.usecase;
 
 import com.agrotech.system.application.port.out.AlertPort;
+import com.agrotech.system.application.port.out.AlertRealtimePort;
 import com.agrotech.system.application.port.out.AreaRepositoryPort;
 import com.agrotech.system.application.port.out.SensorPort;
 import com.agrotech.system.domain.exception.ForbiddenException;
@@ -38,6 +39,9 @@ class AlertUseCaseTest {
     private SensorPort sensorPort;
 
     @Mock
+    private AlertRealtimePort alertRealtimePort;
+
+    @Mock
     private AreaRepositoryPort areaRepositoryPort;
 
     private AlertUseCase useCase;
@@ -48,7 +52,7 @@ class AlertUseCaseTest {
 
     @BeforeEach
     void setUp() {
-        useCase = new AlertUseCase(alertPort, sensorPort, areaRepositoryPort);
+        useCase = new AlertUseCase(alertPort, alertRealtimePort, sensorPort, areaRepositoryPort);
         userId = UUID.randomUUID();
         areaId = UUID.randomUUID();
         sensorId = UUID.randomUUID();
@@ -81,6 +85,7 @@ class AlertUseCaseTest {
         assertEquals(AlertStatus.RESOLVED, output.status());
         assertNotNull(output.resolvedAt());
         verify(alertPort).save(any(Alert.class));
+        verify(alertRealtimePort).publish(any());
     }
 
     @Test

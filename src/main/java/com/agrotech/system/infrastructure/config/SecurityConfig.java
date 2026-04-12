@@ -56,6 +56,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers("/ws-alerts/**").permitAll()
                         .requestMatchers("/api/areas/**").hasAnyRole("OPERADOR", "ADMIN")
                     .requestMatchers("/api/sensors/**").hasAnyRole("OPERADOR", "ADMIN")
                     .requestMatchers("/api/readings", "/api/readings/**").hasAnyRole("OPERADOR", "ADMIN")
