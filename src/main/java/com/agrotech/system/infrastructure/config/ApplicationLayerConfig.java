@@ -3,6 +3,8 @@ package com.agrotech.system.infrastructure.config;
 import com.agrotech.system.application.port.in.AuthUseCase;
 import com.agrotech.system.application.port.in.SensorReadingSimulationUseCase;
 import com.agrotech.system.application.port.in.SensorReadingUseCase;
+import com.agrotech.system.application.port.in.alert.ListAlertsUseCase;
+import com.agrotech.system.application.port.in.alert.ResolveAlertUseCase;
 import com.agrotech.system.application.port.in.area.CreateAreaUseCase;
 import com.agrotech.system.application.port.in.area.DeleteAreaUseCase;
 import com.agrotech.system.application.port.in.area.GetAreaByIdUseCase;
@@ -19,6 +21,7 @@ import com.agrotech.system.application.port.in.rule.DeleteRuleUseCase;
 import com.agrotech.system.application.port.in.rule.ListRulesBySensorUseCase;
 import com.agrotech.system.application.port.in.rule.UpdateRuleUseCase;
 import com.agrotech.system.application.port.out.AccessTokenPort;
+import com.agrotech.system.application.port.out.AlertPort;
 import com.agrotech.system.application.port.out.AreaRepositoryPort;
 import com.agrotech.system.application.port.out.AuthenticationPort;
 import com.agrotech.system.application.port.out.PasswordHashPort;
@@ -26,6 +29,8 @@ import com.agrotech.system.application.port.out.RulePort;
 import com.agrotech.system.application.port.out.SensorPort;
 import com.agrotech.system.application.port.out.SensorReadingPort;
 import com.agrotech.system.application.port.out.UserPort;
+import com.agrotech.system.application.usecase.AlertEvaluationService;
+import com.agrotech.system.application.usecase.AlertUseCase;
 import com.agrotech.system.application.usecase.AreaUseCase;
 import com.agrotech.system.application.usecase.AuthUseCaseImpl;
 import com.agrotech.system.application.usecase.SensorReadingImpl;
@@ -95,17 +100,27 @@ public class ApplicationLayerConfig {
     public SensorReadingUseCase sensorReadingUseCase(
             SensorReadingPort sensorReadingPort,
             SensorPort sensorPort,
-            AreaRepositoryPort areaRepositoryPort
+            AreaRepositoryPort areaRepositoryPort,
+            AlertEvaluationService alertEvaluationService
     ) {
-        return new SensorReadingImpl(sensorReadingPort, sensorPort, areaRepositoryPort);
+        return new SensorReadingImpl(sensorReadingPort, sensorPort, areaRepositoryPort, alertEvaluationService);
     }
 
     @Bean
     public SensorReadingSimulationUseCase sensorReadingSimulationUseCase(
             SensorPort sensorPort,
-            SensorReadingPort sensorReadingPort
+            SensorReadingPort sensorReadingPort,
+            AlertEvaluationService alertEvaluationService
     ) {
-        return new SensorReadingSimulationUseCaseImpl(sensorPort, sensorReadingPort);
+        return new SensorReadingSimulationUseCaseImpl(sensorPort, sensorReadingPort, alertEvaluationService);
+    }
+
+    @Bean
+    public AlertEvaluationService alertEvaluationService(
+            RulePort rulePort,
+            AlertPort alertPort
+    ) {
+        return new AlertEvaluationService(rulePort, alertPort);
     }
 
     @Bean
@@ -175,5 +190,24 @@ public class ApplicationLayerConfig {
     public DeleteRuleUseCase deleteRuleUseCase(RuleUseCase ruleUseCase) {
         return (ruleId, currentUserId, currentRole) ->
                 ruleUseCase.delete(ruleId, currentUserId, currentRole);
+    }
+
+    @Bean
+    public AlertUseCase alertUseCase(
+            AlertPort alertPort,
+            SensorPort sensorPort,
+            AreaRepositoryPort areaRepositoryPort
+    ) {
+        return new AlertUseCase(alertPort, sensorPort, areaRepositoryPort);
+    }
+
+    @Bean
+    public ListAlertsUseCase listAlertsUseCase(AlertUseCase alertUseCase) {
+        return alertUseCase;
+    }
+
+    @Bean
+    public ResolveAlertUseCase resolveAlertUseCase(AlertUseCase alertUseCase) {
+        return alertUseCase;
     }
 }

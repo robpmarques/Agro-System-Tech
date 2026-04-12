@@ -14,10 +14,16 @@ public class SensorReadingSimulationUseCaseImpl implements SensorReadingSimulati
 
     private final SensorPort sensorPort;
     private final SensorReadingPort sensorReadingPort;
+    private final AlertEvaluationService alertEvaluationService;
 
-    public SensorReadingSimulationUseCaseImpl(SensorPort sensorPort, SensorReadingPort sensorReadingPort) {
+    public SensorReadingSimulationUseCaseImpl(
+            SensorPort sensorPort,
+            SensorReadingPort sensorReadingPort,
+            AlertEvaluationService alertEvaluationService
+    ) {
         this.sensorPort = sensorPort;
         this.sensorReadingPort = sensorReadingPort;
+        this.alertEvaluationService = alertEvaluationService;
     }
 
     @Override
@@ -29,7 +35,8 @@ public class SensorReadingSimulationUseCaseImpl implements SensorReadingSimulati
             reading.setSensorId(sensor.getId());
             reading.setValue(generateValueByType(sensor.getType()));
             reading.setRecordedAt(now);
-            sensorReadingPort.save(reading);
+            SensorReading saved = sensorReadingPort.save(reading);
+            alertEvaluationService.evaluateReading(saved);
         }
     }
 
