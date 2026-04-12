@@ -4,6 +4,8 @@ import com.agrotech.system.dto.SensorReadingRequest;
 import com.agrotech.system.dto.SensorReadingResponse;
 import com.agrotech.system.domain.model.Role;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public interface SensorReadingUseCase {
@@ -14,4 +16,14 @@ public interface SensorReadingUseCase {
      * @return resposta com a leitura salva
      */
     SensorReadingResponse recordReading(SensorReadingRequest request, UUID currentUserId, Role currentRole);
+
+    SensorReadingResponse getLatestReading(UUID sensorId, UUID currentUserId, Role currentRole);
+
+    List<SensorReadingResponse> listReadings(
+            UUID sensorId,
+            Instant startDate,
+            Instant endDate,
+            UUID currentUserId,
+            Role currentRole
+    );
 }

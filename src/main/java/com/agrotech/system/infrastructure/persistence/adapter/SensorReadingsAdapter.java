@@ -8,6 +8,11 @@ import com.agrotech.system.infrastructure.persistence.repo.SensorReadingsReposit
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 @Component
 public class SensorReadingsAdapter implements SensorReadingPort {
     private final SensorReadingsRepository sensorReadingsRepository;
@@ -23,6 +28,28 @@ public class SensorReadingsAdapter implements SensorReadingPort {
         SensorReadings entity = toEntity(sensorReading);
         SensorReadings saved = sensorReadingsRepository.save(entity);
         return toDomain(saved);
+    }
+
+    @Override
+    public Optional<SensorReading> findLatestBySensorId(UUID sensorId) {
+        return sensorReadingsRepository.findTopBySensor_IdOrderByRecordedAtDescCreatedAtDesc(sensorId)
+                .map(this::toDomain);
+    }
+
+    @Override
+    public List<SensorReading> findBySensorId(UUID sensorId) {
+        return sensorReadingsRepository.findAllBySensor_IdOrderByRecordedAtDesc(sensorId)
+                .stream()
+                .map(this::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<SensorReading> findBySensorIdAndRecordedAtBetween(UUID sensorId, Instant startDate, Instant endDate) {
+        return sensorReadingsRepository.findAllBySensor_IdAndRecordedAtBetweenOrderByRecordedAtDesc(sensorId, startDate, endDate)
+                .stream()
+                .map(this::toDomain)
+                .toList();
     }
 
     private SensorReading toDomain(SensorReadings entity) {
