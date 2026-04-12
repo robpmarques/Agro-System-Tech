@@ -105,11 +105,11 @@ class SensorReadingImplTest {
     }
 
     @Test
-    void recordReading_especialista_deveLancarForbidden() {
+    void recordReading_perfilNulo_deveLancarForbidden() {
         assertThrows(ForbiddenException.class, () -> useCase.recordReading(
                 new SensorReadingRequest(UUID.randomUUID(), 25.0, Instant.now(), Map.of()),
                 UUID.randomUUID(),
-                Role.ESPECIALISTA
+                null
         ));
 
         verify(sensorPort, never()).findById(any());

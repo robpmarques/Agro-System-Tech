@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 public class UserPersistenceAdapter implements UserPort {
@@ -24,6 +25,11 @@ public class UserPersistenceAdapter implements UserPort {
     }
 
     @Override
+    public boolean existsById(UUID id) {
+        return userRepository.existsById(id);
+    }
+
+    @Override
     public User save(User user) {
         UserEntity entity = toEntity(user);
         return toDomain(userRepository.save(entity));
@@ -32,6 +38,11 @@ public class UserPersistenceAdapter implements UserPort {
     @Override
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email).map(this::toDomain);
+    }
+
+    @Override
+    public Optional<User> findById(UUID id) {
+        return userRepository.findById(id).map(this::toDomain);
     }
 
     @Override

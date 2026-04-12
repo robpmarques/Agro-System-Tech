@@ -27,12 +27,12 @@ public class UsersController {
 
     @GetMapping("/operador/dashboard")
     public ResponseEntity<Map<String, String>> operadorArea() {
-        return ResponseEntity.ok(Map.of("message", "Area liberada para OPERADOR, ESPECIALISTA e ADMIN"));
+        return ResponseEntity.ok(Map.of("message", "Area liberada para OPERADOR e ADMIN"));
     }
 
     @GetMapping("/especialista/dashboard")
     public ResponseEntity<Map<String, String>> especialistaArea() {
-        return ResponseEntity.ok(Map.of("message", "Area liberada para ESPECIALISTA e ADMIN"));
+        return ResponseEntity.ok(Map.of("message", "Area liberada para ADMIN"));
     }
 
     @GetMapping("/admin/dashboard")

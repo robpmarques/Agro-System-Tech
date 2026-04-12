@@ -86,11 +86,11 @@ class SensorUseCaseTest {
     }
 
     @Test
-    void create_especialista_deveLancarForbidden() {
+    void create_perfilNulo_deveLancarForbidden() {
         assertThrows(ForbiddenException.class, () -> sensorUseCase.create(
                 new CreateSensorCommand("Sensor 1", "TEMPERATURE", "P1", areaId, true),
                 userId,
-                Role.ESPECIALISTA
+                null
         ));
 
         verify(sensorPort, never()).save(any(Sensor.class));
