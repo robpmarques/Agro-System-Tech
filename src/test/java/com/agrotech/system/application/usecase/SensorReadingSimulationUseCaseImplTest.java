@@ -33,11 +33,14 @@ class SensorReadingSimulationUseCaseImplTest {
     @Mock
     private SensorReadingPort sensorReadingPort;
 
+    @Mock
+    private AlertEvaluationService alertEvaluationService;
+
     private SensorReadingSimulationUseCaseImpl useCase;
 
     @BeforeEach
     void setUp() {
-        useCase = new SensorReadingSimulationUseCaseImpl(sensorPort, sensorReadingPort);
+        useCase = new SensorReadingSimulationUseCaseImpl(sensorPort, sensorReadingPort, alertEvaluationService);
     }
 
     @Test
@@ -54,6 +57,7 @@ class SensorReadingSimulationUseCaseImplTest {
 
         ArgumentCaptor<SensorReading> captor = ArgumentCaptor.forClass(SensorReading.class);
         verify(sensorReadingPort, times(4)).save(captor.capture());
+        verify(alertEvaluationService, times(4)).evaluateReading(any(SensorReading.class));
 
         Map<UUID, BiConsumer<Double, String>> assertionsBySensorId = Map.of(
                 temperature.getId(), this::assertTemperature,
@@ -76,6 +80,7 @@ class SensorReadingSimulationUseCaseImplTest {
         useCase.simulateReadings();
 
         verify(sensorReadingPort, never()).save(any(SensorReading.class));
+        verify(alertEvaluationService, never()).evaluateReading(any(SensorReading.class));
     }
 
     private Sensor createSensor(String type) {

@@ -21,15 +21,18 @@ public class SensorReadingImpl implements SensorReadingUseCase {
     private final SensorReadingPort sensorReadingPort;
     private final SensorPort sensorPort;
     private final AreaRepositoryPort areaRepositoryPort;
+    private final AlertEvaluationService alertEvaluationService;
 
     public SensorReadingImpl(
             SensorReadingPort sensorReadingPort,
             SensorPort sensorPort,
-            AreaRepositoryPort areaRepositoryPort
+            AreaRepositoryPort areaRepositoryPort,
+            AlertEvaluationService alertEvaluationService
     ) {
         this.sensorReadingPort = sensorReadingPort;
         this.sensorPort = sensorPort;
         this.areaRepositoryPort = areaRepositoryPort;
+        this.alertEvaluationService = alertEvaluationService;
     }
 
     @Override
@@ -51,6 +54,7 @@ public class SensorReadingImpl implements SensorReadingUseCase {
         reading.setData(request.data());
 
         SensorReading savedReading = sensorReadingPort.save(reading);
+        alertEvaluationService.evaluateReading(savedReading);
 
         return new SensorReadingResponse(
                 savedReading.getId(),

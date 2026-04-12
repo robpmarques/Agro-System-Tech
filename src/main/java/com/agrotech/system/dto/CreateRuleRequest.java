@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 
 public record CreateRuleRequest(
         @NotBlank @Size(max = 255) String name,
-        @NotBlank @Size(max = 10) String operator,
+        @NotBlank @Size(max = 20) String operator,
         @NotNull Double threshold,
         Boolean isActive
 ) {

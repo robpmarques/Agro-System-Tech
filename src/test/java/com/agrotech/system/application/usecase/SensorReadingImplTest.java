@@ -42,11 +42,14 @@ class SensorReadingImplTest {
     @Mock
     private AreaRepositoryPort areaRepositoryPort;
 
+    @Mock
+    private AlertEvaluationService alertEvaluationService;
+
     private SensorReadingImpl useCase;
 
     @BeforeEach
     void setUp() {
-        useCase = new SensorReadingImpl(sensorReadingPort, sensorPort, areaRepositoryPort);
+        useCase = new SensorReadingImpl(sensorReadingPort, sensorPort, areaRepositoryPort, alertEvaluationService);
     }
 
     @Test
@@ -78,6 +81,7 @@ class SensorReadingImplTest {
         assertEquals(sensorId, response.sensorId());
         assertEquals(27.5, response.value());
         verify(sensorReadingPort).save(any(SensorReading.class));
+        verify(alertEvaluationService).evaluateReading(any(SensorReading.class));
     }
 
     @Test
