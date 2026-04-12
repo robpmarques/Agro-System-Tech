@@ -4,6 +4,7 @@ import com.agrotech.system.application.port.in.alert.AlertOutput;
 import com.agrotech.system.application.port.in.alert.ListAlertsUseCase;
 import com.agrotech.system.application.port.in.alert.ResolveAlertUseCase;
 import com.agrotech.system.application.port.out.AlertPort;
+import com.agrotech.system.application.port.out.AlertRealtimePort;
 import com.agrotech.system.application.port.out.AreaRepositoryPort;
 import com.agrotech.system.application.port.out.SensorPort;
 import com.agrotech.system.domain.exception.ForbiddenException;
@@ -12,6 +13,7 @@ import com.agrotech.system.domain.model.Alert;
 import com.agrotech.system.domain.model.AlertStatus;
 import com.agrotech.system.domain.model.Role;
 import com.agrotech.system.domain.model.Sensor;
+import com.agrotech.system.dto.AlertRealtimeMessage;
 
 import java.time.Instant;
 import java.util.List;
@@ -21,11 +23,18 @@ import java.util.UUID;
 public class AlertUseCase implements ListAlertsUseCase, ResolveAlertUseCase {
 
     private final AlertPort alertPort;
+    private final AlertRealtimePort alertRealtimePort;
     private final SensorPort sensorPort;
     private final AreaRepositoryPort areaRepositoryPort;
 
-    public AlertUseCase(AlertPort alertPort, SensorPort sensorPort, AreaRepositoryPort areaRepositoryPort) {
+    public AlertUseCase(
+            AlertPort alertPort,
+            AlertRealtimePort alertRealtimePort,
+            SensorPort sensorPort,
+            AreaRepositoryPort areaRepositoryPort
+    ) {
         this.alertPort = alertPort;
+        this.alertRealtimePort = alertRealtimePort;
         this.sensorPort = sensorPort;
         this.areaRepositoryPort = areaRepositoryPort;
     }
@@ -64,6 +73,7 @@ public class AlertUseCase implements ListAlertsUseCase, ResolveAlertUseCase {
             alert.setStatus(AlertStatus.RESOLVED);
             alert.setResolvedAt(Instant.now());
             alert = alertPort.save(alert);
+            alertRealtimePort.publish(toRealtimeMessage(alert));
         }
 
         return toOutput(alert);
@@ -116,6 +126,19 @@ public class AlertUseCase implements ListAlertsUseCase, ResolveAlertUseCase {
 
     private AlertOutput toOutput(Alert alert) {
         return new AlertOutput(
+                alert.getId(),
+                alert.getSensorId(),
+                alert.getRuleId(),
+                alert.getValue(),
+                alert.getMessage(),
+                alert.getStatus(),
+                alert.getTriggeredAt(),
+                alert.getResolvedAt()
+        );
+    }
+
+    private AlertRealtimeMessage toRealtimeMessage(Alert alert) {
+        return new AlertRealtimeMessage(
                 alert.getId(),
                 alert.getSensorId(),
                 alert.getRuleId(),

@@ -1,11 +1,13 @@
 package com.agrotech.system.application.usecase;
 
 import com.agrotech.system.application.port.out.AlertPort;
+import com.agrotech.system.application.port.out.AlertRealtimePort;
 import com.agrotech.system.application.port.out.RulePort;
 import com.agrotech.system.domain.model.Alert;
 import com.agrotech.system.domain.model.AlertStatus;
 import com.agrotech.system.domain.model.Rule;
 import com.agrotech.system.domain.model.SensorReading;
+import com.agrotech.system.dto.AlertRealtimeMessage;
 
 import java.time.Instant;
 import java.util.List;
@@ -15,10 +17,12 @@ public class AlertEvaluationService {
 
     private final RulePort rulePort;
     private final AlertPort alertPort;
+    private final AlertRealtimePort alertRealtimePort;
 
-    public AlertEvaluationService(RulePort rulePort, AlertPort alertPort) {
+    public AlertEvaluationService(RulePort rulePort, AlertPort alertPort, AlertRealtimePort alertRealtimePort) {
         this.rulePort = rulePort;
         this.alertPort = alertPort;
+        this.alertRealtimePort = alertRealtimePort;
     }
 
     public void evaluateReading(SensorReading reading) {
@@ -39,8 +43,22 @@ public class AlertEvaluationService {
             alert.setStatus(AlertStatus.ACTIVE);
             alert.setTriggeredAt(reading.getRecordedAt() != null ? reading.getRecordedAt() : Instant.now());
             alert.setMessage(buildMessage(rule, reading.getValue()));
-            alertPort.save(alert);
+            Alert savedAlert = alertPort.save(alert);
+            alertRealtimePort.publish(toRealtimeMessage(savedAlert));
         }
+    }
+
+    private AlertRealtimeMessage toRealtimeMessage(Alert alert) {
+        return new AlertRealtimeMessage(
+                alert.getId(),
+                alert.getSensorId(),
+                alert.getRuleId(),
+                alert.getValue(),
+                alert.getMessage(),
+                alert.getStatus(),
+                alert.getTriggeredAt(),
+                alert.getResolvedAt()
+        );
     }
 
     private boolean matches(Rule rule, Double value) {
