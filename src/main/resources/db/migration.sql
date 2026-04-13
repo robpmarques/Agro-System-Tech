@@ -15,7 +15,7 @@ CREATE TABLE users
     email      VARCHAR(255) NOT NULL UNIQUE,
     password   VARCHAR(255) NOT NULL,
     active     BOOLEAN      NOT NULL DEFAULT TRUE,
-    role       VARCHAR(32)  NOT NULL CHECK (role IN ('ADMIN', 'OPERADOR', 'ESPECIALISTA')),
+    role       VARCHAR(32)  NOT NULL CHECK (role IN ('ADMIN', 'OPERADOR')),
     created_at TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
 

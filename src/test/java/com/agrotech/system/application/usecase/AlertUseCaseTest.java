@@ -89,8 +89,8 @@ class AlertUseCaseTest {
     }
 
     @Test
-    void list_especialista_deveLancarForbidden() {
-        assertThrows(ForbiddenException.class, () -> useCase.list(null, userId, Role.ESPECIALISTA));
+    void list_perfilNulo_deveLancarForbidden() {
+        assertThrows(ForbiddenException.class, () -> useCase.list(null, userId, null));
     }
 
     @Test

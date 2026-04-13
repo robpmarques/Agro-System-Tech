@@ -12,7 +12,7 @@ Table users {
   name varchar [not null]
   email varchar [unique, not null]
   password varchar [not null]
-  role varchar [not null, note: 'ADMIN | OPERADOR | ESPECIALISTA']
+  role varchar [not null, note: 'ADMIN | OPERADOR']
   created_at timestamptz [not null]
 }
 

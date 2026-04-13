@@ -16,6 +16,12 @@ import com.agrotech.system.application.port.in.sensor.GetSensorByIdUseCase;
 import com.agrotech.system.application.port.in.sensor.ListSensorsUseCase;
 import com.agrotech.system.application.port.in.sensor.UpdateSensorActivationUseCase;
 import com.agrotech.system.application.port.in.sensor.UpdateSensorUseCase;
+import com.agrotech.system.application.port.in.sensorplan.AssignSpecialistUseCase;
+import com.agrotech.system.application.port.in.sensorplan.CreatePlannedSensorUseCase;
+import com.agrotech.system.application.port.in.sensorplan.CreateSensorPlanUseCase;
+import com.agrotech.system.application.port.in.sensorplan.ListPlannedSensorsUseCase;
+import com.agrotech.system.application.port.in.sensorplan.ListSensorPlansUseCase;
+import com.agrotech.system.application.port.in.sensorplan.UpdateSensorPlanStatusUseCase;
 import com.agrotech.system.application.port.in.rule.CreateRuleUseCase;
 import com.agrotech.system.application.port.in.rule.DeleteRuleUseCase;
 import com.agrotech.system.application.port.in.rule.ListRulesBySensorUseCase;
@@ -25,8 +31,10 @@ import com.agrotech.system.application.port.out.AlertPort;
 import com.agrotech.system.application.port.out.AlertRealtimePort;
 import com.agrotech.system.application.port.out.AreaRepositoryPort;
 import com.agrotech.system.application.port.out.AuthenticationPort;
+import com.agrotech.system.application.port.out.PlannedSensorPort;
 import com.agrotech.system.application.port.out.PasswordHashPort;
 import com.agrotech.system.application.port.out.RulePort;
+import com.agrotech.system.application.port.out.SensorPlanPort;
 import com.agrotech.system.application.port.out.SensorPort;
 import com.agrotech.system.application.port.out.SensorReadingPort;
 import com.agrotech.system.application.port.out.UserPort;
@@ -38,6 +46,7 @@ import com.agrotech.system.application.usecase.SensorReadingImpl;
 import com.agrotech.system.application.usecase.SensorReadingSimulationUseCaseImpl;
 import com.agrotech.system.application.usecase.SensorUseCase;
 import com.agrotech.system.application.usecase.RuleUseCase;
+import com.agrotech.system.application.usecase.SensorPlanningUseCase;
 import com.agrotech.system.domain.service.UserDomainService;
 import com.agrotech.system.infrastructure.websocket.AlertWebSocketPublisher;
 import org.springframework.context.annotation.Bean;
@@ -170,6 +179,47 @@ public class ApplicationLayerConfig {
     @Bean
     public DeleteSensorUseCase deleteSensorUseCase(SensorUseCase sensorUseCase) {
         return sensorUseCase;
+    }
+
+    @Bean
+    public SensorPlanningUseCase sensorPlanningUseCase(
+            SensorPlanPort sensorPlanPort,
+            PlannedSensorPort plannedSensorPort,
+            SensorPort sensorPort,
+            AreaRepositoryPort areaRepositoryPort,
+            UserPort userPort
+    ) {
+        return new SensorPlanningUseCase(sensorPlanPort, plannedSensorPort, sensorPort, areaRepositoryPort, userPort);
+    }
+
+    @Bean
+    public CreateSensorPlanUseCase createSensorPlanUseCase(SensorPlanningUseCase sensorPlanningUseCase) {
+        return sensorPlanningUseCase;
+    }
+
+    @Bean
+    public ListSensorPlansUseCase listSensorPlansUseCase(SensorPlanningUseCase sensorPlanningUseCase) {
+        return sensorPlanningUseCase;
+    }
+
+    @Bean
+    public AssignSpecialistUseCase assignSpecialistUseCase(SensorPlanningUseCase sensorPlanningUseCase) {
+        return sensorPlanningUseCase;
+    }
+
+    @Bean
+    public CreatePlannedSensorUseCase createPlannedSensorUseCase(SensorPlanningUseCase sensorPlanningUseCase) {
+        return sensorPlanningUseCase;
+    }
+
+    @Bean
+    public ListPlannedSensorsUseCase listPlannedSensorsUseCase(SensorPlanningUseCase sensorPlanningUseCase) {
+        return sensorPlanningUseCase;
+    }
+
+    @Bean
+    public UpdateSensorPlanStatusUseCase updateSensorPlanStatusUseCase(SensorPlanningUseCase sensorPlanningUseCase) {
+        return sensorPlanningUseCase;
     }
 
     @Bean

@@ -95,11 +95,11 @@ class RuleUseCaseTest {
     }
 
     @Test
-    void create_especialista_deveLancarForbidden() {
+    void create_perfilNulo_deveLancarForbidden() {
         assertThrows(ForbiddenException.class, () -> ruleUseCase.create(
                 new CreateRuleCommand("Regra", "GT", 10.0, true, sensorId),
                 userId,
-                Role.ESPECIALISTA
+                null
         ));
 
         verify(rulePort, never()).save(any(Rule.class));
